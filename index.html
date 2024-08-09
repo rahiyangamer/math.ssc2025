@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSC 2025 Math Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        #login-container,
+        #quiz-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input[type="text"],
+        input[type="password"] {
+            margin: 10px 0;
+            padding: 10px;
+            width: calc(100% - 22px);
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+        .correct {
+            background-color: #d4edda;
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect {
+            background-color: #f8d7da;
+            color: red;
+            font-weight: bold;
+        }
+        #result {
+            margin: 20px 0;
+        }
+        #buttons-container {
+            margin-top: 20px;
+        }
+        .quiz-option {
+            display: block;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .quiz-option:hover {
+            background-color: #e2e6ea;
+        }
+        .quiz-option input {
+            margin-right: 10px;
+        }
+        #prev-btn, #submit-btn, #next-quiz-btn {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-container">
+        <h1>Login</h1>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+            <div id="error-message" class="error"></div>
+        </form>
+    </div>
+
+    <div id="quiz-container" style="display: none;">
+        <h1>SSC 2025 Math Quiz</h1>
+        <div id="quiz"></div>
+        <div id="buttons-container">
+            <button id="prev-btn" onclick="goBack()">পিছনে</button>
+            <button id="submit-btn" onclick="checkAnswer()">জমা দিন</button>
+        </div>
+        <h2 id="result"></h2>
+        <button id="next-quiz-btn" style="display:none;" onclick="loadNextQuiz()">পরবতী কুইজ</button>
+    </div>
+
+    <script>
+        const quiz = [
+    { question: "1. ধারা 2, 4, 6, 8 এর ১০ম পদ কি?", options: ["10", "20", "18", "16"], answer: 1 },
+    { question: "2. বৃত্তের ব্যাসার্ধ যদি ৫ মিটার হয়, তবে এর ক্ষেত্রফল কত?", options: ["25π", "20π", "5π", "50π"], answer: 0 },
+    { question: "3. 2x + 3 = 7 হলে, x এর মান কত?", options: ["1", "2", "3", "4"], answer: 1 },
+    { question: "4. √49 এর মান কত?", options: ["5", "6", "7", "8"], answer: 2 },
+    { question: "5. 10-এর 30% কত?", options: ["3", "7", "10", "4"], answer: 0 },
+    { question: "6. একটি বৃত্তের ব্যাস 14 মিটার হলে, এর পরিধি কত?", options: ["44 মিটার", "28 মিটার", "22 মিটার", "36 মিটার"], answer: 0 },
+    { question: "7. 3 এবং 5-এর গুণফল কত?", options: ["15", "10", "8", "20"], answer: 0 },
+    { question: "8. 2/5 + 3/5 = ?", options: ["1", "5/5", "4/5", "2"], answer: 2 },
+    { question: "9. একটি আয়তক্ষেত্রের দৈর্ঘ্য 10 মিটার এবং প্রস্থ 5 মিটার হলে, ক্ষেত্রফল কত?", options: ["15 বর্গমিটার", "50 বর্গমিটার", "100 বর্গমিটার", "25 বর্গমিটার"], answer: 1 },
+    { question: "10. 15x = 75 হলে, x এর মান কত?", options: ["5", "3", "4", "6"], answer: 1 },
+    { question: "11. যদি একটি সংখ্যা ৩ দ্বারা বিভাজ্য হয়, তবে তা কত?", options: ["1", "5", "9", "6"], answer: 3 },
+    { question: "12. 8-এর 25% কত?", options: ["2", "4", "1", "6"], answer: 0 },
+    { question: "13. 36-এর বর্গমূল কত?", options: ["6", "12", "18", "9"], answer: 0 },
+    { question: "14. একটি ত্রিভুজের ৩টি কোণ যোগফল কত?", options: ["90°", "180°", "360°", "120°"], answer: 1 },
+    { question: "15. ধারা 3, 6, 9, 12-এর সাধারণ পার্থক্য কত?", options: ["2", "3", "4", "6"], answer: 1 },
+    { question: "16. x^2 = 64 হলে, x এর মান কত?", options: ["8", "6", "7", "4"], answer: 0 },
+    { question: "17. 1/2 এর শতকরা কত ভাগ?", options: ["25%", "50%", "75%", "100%"], answer: 1 },
+    { question: "18. একটি বৃত্তের ব্যাস 14 সেমি হলে, এর ব্যাসার্ধ কত?", options: ["7 সেমি", "14 সেমি", "28 সেমি", "10 সেমি"], answer: 0 },
+    { question: "19. 7 × 8 = ?", options: ["42", "48", "56", "64"], answer: 2 },
+    { question: "20. একত্রিত সংখ্যা 16 এর বর্গমূল কত?", options: ["2", "4", "8", "6"], answer: 1 },
+    { question: "21. 45 এর 20% কত?", options: ["9", "10", "11", "12"], answer: 0 },
+    { question: "22. 1 লিটার = কত মিলিলিটার?", options: ["100 মিলিলিটার", "500 মিলিলিটার", "1000 মিলিলিটার", "1500 মিলিলিটার"], answer: 2 },
+    { question: "23. সমান্তর ধারার প্রথম এবং শেষ পদ যদি 5 এবং 20 হয়, তবে ধারাটির পদ সংখ্যা কত?", options: ["5", "10", "15", "8"], answer: 3 },
+    { question: "24. 4x = 28 হলে, x এর মান কত?", options: ["5", "6", "7", "8"], answer: 2 },
+    { question: "25. একটি বৃত্তের পরিধি যদি 44 মিটার হয়, তবে এর ব্যাসার্ধ কত?", options: ["7 মিটার", "14 মিটার", "21 মিটার", "28 মিটার"], answer: 0 },
+    { question: "26. একটি ত্রিভুজের ২টি বাহু 5 মিটার এবং 12 মিটার হলে, তৃতীয় বাহু কত?", options: ["5 মিটার", "13 মিটার", "12 মিটার", "15 মিটার"], answer: 1 },
+    { question: "27. যদি কোনো ত্রিভুজের ২টি কোণ 45° এবং 60° হয়, তবে তৃতীয় কোণ কত?", options: ["75°", "60°", "45°", "30°"], answer: 0 },
+    { question: "28. একটি রেকটাঙ্গেল এর পরিধি 36 মিটার হলে, এবং এক পাশ 10 মিটার হলে অন্য পাশের দৈর্ঘ্য কত?", options: ["8 মিটার", "6 মিটার", "10 মিটার", "16 মিটার"], answer: 1 },
+    { question: "29. একটি সংখ্যা ৭ দ্বারা ভাগ করলে ৩ বাকী থাকে। যদি সংখ্যাটি ৫০০ হয় তবে বিভাজক কত?", options: ["73", "7", "30", "5"], answer: 1 },
+    { question: "30. 9 + 15 × (3 - 2) = ?", options: ["24", "27", "18", "12"], answer: 1 },
+];0
+
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
+        let selectedAnswers = [];
+        let wrongAnswers = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginContainer = document.getElementById('login-container');
+            const quizContainer = document.getElementById('quiz-container');
+
+            if (sessionStorage.getItem('loggedIn')) {
+                loginContainer.style.display = 'none';
+                quizContainer.style.display = 'block';
+                loadQuestion(currentQuestionIndex);
+            }
+
+            document.getElementById('login-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                if (username === 'nasrin' && password === 'ssc2025') {
+                    sessionStorage.setItem('loggedIn', 'true');
+                    loginContainer.style.display = 'none';
+                    quizContainer.style.display = 'block';
+                    loadQuestion(currentQuestionIndex);
+                } else {
+                    document.getElementById('error-message').textContent = 'Invalid username or password';
+                }
+            });
+        });
+
+        function loadQuestion(index) {
+            const question = quiz[index];
+            const quizContainer = document.getElementById('quiz');
+            quizContainer.innerHTML = `
+                <h3>${question.question}</h3>
+                ${question.options.map((option, i) => `
+                    <label class="quiz-option">
+                        <input type="radio" name="option" value="${i}"> ${option}
+                    </label>
+                `).join('')}
+            `;
+        }
+
+        function checkAnswer() {
+            const selectedOption = document.querySelector('input[name="option"]:checked');
+            
+            if (selectedOption) {
+                const answer = parseInt(selectedOption.value);
+                const correctAnswer = quiz[currentQuestionIndex].answer;
+                
+                selectedAnswers[currentQuestionIndex] = answer;
+
+                if (answer === correctAnswer) {
+                    correctAnswers++;
+                } else {
+                    wrongAnswers.push(currentQuestionIndex + 1);
+                }
+                
+                highlightAnswers();
+                
+                if (currentQuestionIndex < quiz.length - 1) {
+                    setTimeout(() => {
+                        currentQuestionIndex++;
+                        loadQuestion(currentQuestionIndex);
+                    }, 1000);
+                } else {
+                    showFinalResult();
+                }
+            } else {
+                alert('Please select an option!');
+            }
+        }
+
+        function highlightAnswers() {
+            const labels = document.querySelectorAll('.quiz-option');
+            const correctAnswer = quiz[currentQuestionIndex].answer;
+
+            labels.forEach((label, index) => {
+                if (index === correctAnswer) {
+                    label.classList.add('correct');
+                } else if (selectedAnswers[currentQuestionIndex] === index) {
+                    label.classList.add('incorrect');
+                }
+            });
+        }
+
+        function showFinalResult() {
+            const resultContainer = document.getElementById('result');
+            const nextQuizBtn = document.getElementById('next-quiz-btn');
+
+            if (correctAnswers === quiz.length) {
+                resultContainer.innerHTML = `
+                    Congratulations 🎉
+                    <br>সঠিক উত্তরের সংখ্যা: ${correctAnswers}
+                `;
+                nextQuizBtn.style.display = 'block';
+            } else {
+                resultContainer.innerHTML = `
+                    😓 তুমি সব সঠিক উত্তর দিতে পারো নাই তাই আবার চেষ্টা করো
+                    <br>ভুল উত্তরগুলোর সংখ্যা: ${wrongAnswers.length}
+                    <br>ভুল উত্তরগুলি: ${wrongAnswers.join(', ')}
+                `;
+                nextQuizBtn.style.display = 'none';
+            }
+        }
+
+        function loadNextQuiz() {
+            // Load next quiz or handle further logic
+        }
+
+        function goBack() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion(currentQuestionIndex);
+                highlightAnswers();
+                document.getElementById('result').innerHTML = '';
+            } else {
+                alert('This is the first question.');
+            }
+        }
+    </script>
+</body>
+</html>
